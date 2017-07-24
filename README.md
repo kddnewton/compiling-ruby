@@ -1,4 +1,4 @@
-# Yars
+# Yet another ruby syntax
 
 ## Installation
 
