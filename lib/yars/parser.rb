@@ -9,10 +9,11 @@ module Yars
   class Parser < Racc::Parser
 
 module_eval(<<'...end parser.y/module_eval...', 'parser.y', 21)
+  include Yars
   attr_reader :lexer
 
   def parse(input)
-    @lexer = Yars::Lexer.new(input)
+    @lexer = Lexer.new(input)
     do_parse
   end
 
@@ -66,7 +67,7 @@ racc_reduce_table = [
   3, 12, :_reduce_6,
   3, 12, :_reduce_7,
   2, 12, :_reduce_8,
-  1, 12, :_reduce_none ]
+  1, 12, :_reduce_9 ]
 
 racc_reduce_n = 10
 
@@ -117,9 +118,9 @@ Racc_token_to_s_table = [
   "NUMBER",
   "$start",
   "target",
-  "exp" ]
+  "expr" ]
 
-Racc_debug_parser = true
+Racc_debug_parser = false
 
 ##### State transition tables end #####
 
@@ -136,28 +137,28 @@ module_eval(<<'.,.,', 'parser.y', 8)
 
 module_eval(<<'.,.,', 'parser.y', 10)
   def _reduce_3(val, _values, result)
-     result += val[2] 
+     result = Node::Expr.new(*val[0..2]) 
     result
   end
 .,.,
 
 module_eval(<<'.,.,', 'parser.y', 11)
   def _reduce_4(val, _values, result)
-     result -= val[2] 
+     result = Node::Expr.new(*val[0..2]) 
     result
   end
 .,.,
 
 module_eval(<<'.,.,', 'parser.y', 12)
   def _reduce_5(val, _values, result)
-     result *= val[2] 
+     result = Node::Expr.new(*val[0..2]) 
     result
   end
 .,.,
 
 module_eval(<<'.,.,', 'parser.y', 13)
   def _reduce_6(val, _values, result)
-     result /= val[2] 
+     result = Node::Expr.new(*val[0..2]) 
     result
   end
 .,.,
@@ -171,12 +172,17 @@ module_eval(<<'.,.,', 'parser.y', 14)
 
 module_eval(<<'.,.,', 'parser.y', 15)
   def _reduce_8(val, _values, result)
-     result = -val[1] 
+     result = Node::Number.new(-val[1]) 
     result
   end
 .,.,
 
-# reduce 9 omitted
+module_eval(<<'.,.,', 'parser.y', 16)
+  def _reduce_9(val, _values, result)
+     result = Node::Number.new(val[0]) 
+    result
+  end
+.,.,
 
 def _reduce_none(val, _values, result)
   val[0]

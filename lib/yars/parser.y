@@ -5,23 +5,24 @@ class Yars::Parser
     left '+' '-'
   preclow
 rule
-  target: exp
-        | /* none */ { result = 0 }
+  target: expr
+        | /* none */        { result = 0 }
 
-  exp: exp '+' exp { result += val[2] }
-     | exp '-' exp { result -= val[2] }
-     | exp '*' exp { result *= val[2] }
-     | exp '/' exp { result /= val[2] }
-     | '(' exp ')' { result = val[1] }
-     | '-' NUMBER  =UMINUS { result = -val[1] }
-     | NUMBER
+  expr: expr '+' expr       { result = Node::Expr.new(*val[0..2]) }
+      | expr '-' expr       { result = Node::Expr.new(*val[0..2]) }
+      | expr '*' expr       { result = Node::Expr.new(*val[0..2]) }
+      | expr '/' expr       { result = Node::Expr.new(*val[0..2]) }
+      | '(' expr ')'        { result = val[1] }
+      | '-' NUMBER  =UMINUS { result = Node::Number.new(-val[1]) }
+      | NUMBER              { result = Node::Number.new(val[0]) }
 end
 
 ---- inner
+  include Yars
   attr_reader :lexer
 
   def parse(input)
-    @lexer = Yars::Lexer.new(input)
+    @lexer = Lexer.new(input)
     do_parse
   end
 
