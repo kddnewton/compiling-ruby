@@ -5,14 +5,14 @@
 #
 
 require 'racc/parser.rb'
-module Yapl
+module Yars
   class Parser < Racc::Parser
 
 module_eval(<<'...end parser.y/module_eval...', 'parser.y', 21)
   attr_reader :lexer
 
   def parse(input)
-    @lexer = Yapl::Lexer.new(input)
+    @lexer = Yars::Lexer.new(input)
     do_parse
   end
 
@@ -119,7 +119,7 @@ Racc_token_to_s_table = [
   "target",
   "exp" ]
 
-Racc_debug_parser = false
+Racc_debug_parser = true
 
 ##### State transition tables end #####
 
@@ -183,4 +183,4 @@ def _reduce_none(val, _values, result)
 end
 
   end   # class Parser
-  end   # module Yapl
+  end   # module Yars

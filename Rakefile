@@ -9,7 +9,9 @@ end
 
 task default: :test
 
-desc 'Build the parser'
-task :raccify do
-  `racc lib/yapl/parser.y -o lib/yapl/parser.rb`
+rule '.rb' => '.y' do |t|
+   sh "racc -o #{t.name} #{t.source}"
 end
+
+desc 'Build the parser'
+task racc: ['lib/yars/parser.rb']
