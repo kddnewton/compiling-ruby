@@ -16,9 +16,13 @@ module Yars
     def parse(input)
       until input.empty?
         case input
+        when /\A\n/
+          tokens << [:NEWLINE, "\n"]
         when /\A\s+/
         when /\A\d+/
           tokens << [:NUMBER, $&.to_i]
+        when /\A[a-z]([A-Za-z0-9_]+)?/
+          tokens << [:IDENT, $&]
         when /\A.|\n/o
           symbol = $&
           tokens << [symbol, symbol]
