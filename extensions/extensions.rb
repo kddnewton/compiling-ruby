@@ -21,6 +21,7 @@ module Extensions
 
   self.modifiers = [
     RegexModifier.new(/~d\((.+?)\)/, 'Date.parse("\1")'),
+    RegexModifier.new(/~n\(([0-9\s+-/*\(\)]+?)\)/) { |match| eval(match[3..-2]) },
     RegexModifier.new(/~u\((.+?)\)/, 'URI.parse("\1")')
   ]
 end

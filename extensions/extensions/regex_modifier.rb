@@ -1,14 +1,17 @@
 module Extensions
   class RegexModifier
-    attr_reader :pattern, :replacement
+    attr_reader :pattern, :replacement, :block
 
-    def initialize(pattern, replacement)
+    def initialize(pattern, replacement = nil, &block)
       @pattern = pattern
       @replacement = replacement
+      @block = block
     end
 
     def modify(source)
-      source.gsub(pattern, replacement)
+      replacement ?
+        source.gsub(pattern, replacement) :
+        source.gsub(pattern, &block)
     end
   end
 end
