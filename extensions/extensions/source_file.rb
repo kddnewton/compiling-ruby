@@ -8,7 +8,12 @@ module Extensions
     end
 
     def dump
-      iseq = RubyVM::InstructionSequence.compile_file(source_path)
+      source = File.read(source_path)
+      Extensions.modifiers.each do |modifier|
+        source = modifier.modify(source)
+      end
+
+      iseq = RubyVM::InstructionSequence.compile(source)
       digest = ::Digest::SHA1.file(source_path).digest
       File.binwrite(iseq_path, iseq.to_binary("SHA-1:#{digest}"))
       iseq
