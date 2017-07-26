@@ -1,0 +1,13 @@
+#!/usr/bin/env ruby
+
+if ARGV.empty?
+  STDERR.puts 'Usage: yars [path/to/script]'
+  exit 1
+end
+
+require 'bundler/setup'
+
+$LOAD_PATH.unshift File.expand_path('../../lib', __FILE__)
+require 'yars'
+
+puts Yars::Parser.parse(File.read(ARGV.first).strip).exec
