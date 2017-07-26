@@ -20,6 +20,7 @@ module Extensions
   FileUtils.mkdir_p(iseq_dir) unless File.directory?(iseq_dir)
 
   self.modifiers = [
+    RegexModifier.new(/~d\((.+?)\)/, 'Date.parse("\1")'),
     RegexModifier.new(/~u\((.+?)\)/, 'URI.parse("\1")')
   ]
 end
