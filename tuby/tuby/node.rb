@@ -1,4 +1,4 @@
-module Yars
+module Tuby
   module Node
     Assign = Struct.new(:ident, :expr) do
       def compile

@@ -3,4 +3,4 @@ rule '.rb' => '.y' do |t|
 end
 
 desc 'Build the parser'
-task default: ['lib/yars/parser.rb']
+task default: ['tuby/tuby/parser.rb']

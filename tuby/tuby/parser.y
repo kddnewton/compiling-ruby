@@ -1,4 +1,4 @@
-class Yars::Parser
+class Tuby::Parser
   prechigh
     nonassoc UMINUS
     left '*' '/'
@@ -32,7 +32,7 @@ rule
 end
 
 ---- inner
-  include Yars
+  include Tuby
   attr_reader :lexer
 
   def parse(input)

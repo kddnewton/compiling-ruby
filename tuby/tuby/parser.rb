@@ -5,11 +5,11 @@
 #
 
 require 'racc/parser.rb'
-module Yars
+module Tuby
   class Parser < Racc::Parser
 
 module_eval(<<'...end parser.y/module_eval...', 'parser.y', 35)
-  include Yars
+  include Tuby
   attr_reader :lexer
 
   def parse(input)
@@ -267,4 +267,4 @@ def _reduce_none(val, _values, result)
 end
 
   end   # class Parser
-  end   # module Yars
+  end   # module Tuby

@@ -1,4 +1,4 @@
-module Yars
+module Tuby
   class Lexer
     attr_reader :tokens
 
