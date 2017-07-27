@@ -1,6 +1,4 @@
-rule '.rb' => '.y' do |t|
-   sh "racc -o #{t.name} #{t.source}"
+desc 'Build the tuby parser'
+task :tuby do
+  sh 'racc -o tuby/tuby/parser.rb tuby/tuby/parser.y'
 end
-
-desc 'Build the parser'
-task default: ['tuby/tuby/parser.rb']

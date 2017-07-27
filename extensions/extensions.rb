@@ -1,13 +1,21 @@
 require 'digest/sha1'
-require 'extensions/regex_modifier'
-require 'extensions/source_file'
+require 'parser'
+require 'tempfile'
 
 module Extensions
   class << self
     attr_accessor :iseq_dir, :modifiers
 
+    def add(modifier)
+      modifiers << modifier
+    end
+
     def clear
       Dir.glob(File.join(iseq_dir, '**/*.yarb')) { |path| File.delete(path) }
+    end
+
+    def configure
+      yield self
     end
 
     def iseq_path_for(source_path)
@@ -19,12 +27,14 @@ module Extensions
     File.expand_path(File.join('..', '.iseq'), __dir__)
   FileUtils.mkdir_p(iseq_dir) unless File.directory?(iseq_dir)
 
-  self.modifiers = [
-    RegexModifier.new(/~d\((.+?)\)/, 'Date.parse("\1")'),
-    RegexModifier.new(/~n\(([\d\s+-\/*\(\)]+?)\)/) { |match| eval(match[3..-2]) },
-    RegexModifier.new(/~u\((.+?)\)/, 'URI.parse("\1")')
-  ]
+  self.modifiers = []
 end
+
+require 'extensions/ast_modifier'
+require 'extensions/ast_parser'
+require 'extensions/regex_modifier'
+require 'extensions/source_file'
+require 'extensions/config'
 
 RubyVM::InstructionSequence.singleton_class.prepend(Module.new do
   def load_iseq(filepath)
