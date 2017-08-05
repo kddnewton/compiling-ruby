@@ -7,20 +7,20 @@ class Tuby::Parser
 rule
   target: scope
 
-  assign: identifier '=' expr { result = Node::Assign.new(val[0], val[2]) }
+  assign: identifier '=' expr     { result = Node::Assign.new(val[0], val[2]) }
 
-  expr: expr '+' expr         { result = Node::Binary.new(*val[0..2]) }
-      | expr '-' expr         { result = Node::Binary.new(*val[0..2]) }
-      | expr '*' expr         { result = Node::Binary.new(*val[0..2]) }
-      | expr '/' expr         { result = Node::Binary.new(*val[0..2]) }
-      | '(' expr ')'          { result = val[1] }
+  expr: expr '+' expr             { result = Node::Binary.new(*val[0..2]) }
+      | expr '-' expr             { result = Node::Binary.new(*val[0..2]) }
+      | expr '*' expr             { result = Node::Binary.new(*val[0..2]) }
+      | expr '/' expr             { result = Node::Binary.new(*val[0..2]) }
+      | '(' expr ')'              { result = val[1] }
       | number
       | identifier
 
-  number: '-' NUMBER  =UMINUS { result = Node::Number.new(-val[1]) }
-        | NUMBER              { result = Node::Number.new(val[0]) }
+  number: '-' NUMBER  =UMINUS     { result = Node::Number.new(-val[1]) }
+        | NUMBER                  { result = Node::Number.new(val[0]) }
 
-  identifier: IDENT           { result = Node::Ident.new(val[0]) }
+  identifier: IDENT               { result = Node::Ident.new(val[0]) }
 
   scope: statement                { result = Node::Scope.new(val[0]) }
        | scope stmt_end statement { val[0] << val[2]; result = val[0] }

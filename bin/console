@@ -8,5 +8,8 @@ require 'extensions'
 $LOAD_PATH.unshift File.expand_path('../../tuby', __FILE__)
 require 'tuby'
 
+require_relative '../sample/sigils'
+require_relative '../sample/type_safety'
+
 require 'irb'
 IRB.start(__FILE__)
