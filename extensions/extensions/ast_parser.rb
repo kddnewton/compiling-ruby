@@ -14,13 +14,19 @@ module Extensions
         compile_parser(file.path)
       end
 
-      require 'extensions/parser'
+      load 'extensions/parser.rb'
       Parser::Extensions.new(builder)
     end
 
-    def self.parse(string)
-      @parser ||= new.parser
-      @parser.parse(Parser::Base.send(:setup_source_buffer, '(string)', 1, string, @parser.default_encoding))
+    class << self
+      def parse(string)
+        parser.reset
+        parser.parse(Parser::Base.send(:setup_source_buffer, '(string)', 1, string, @parser.default_encoding))
+      end
+
+      def parser
+        @parser ||= new.parser
+      end
     end
 
     private

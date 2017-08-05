@@ -34,10 +34,22 @@ require 'extensions/ast_modifier'
 require 'extensions/ast_parser'
 require 'extensions/regex_modifier'
 require 'extensions/source_file'
-require 'extensions/config'
+
+Dir[File.expand_path('extensions/modifiers/*', __dir__)].each do |modifier_source_file|
+  require modifier_source_file
+end
+
+Extensions.configure do |config|
+  config.add Extensions::Modifiers::DateSigil.new
+  config.add Extensions::Modifiers::URISigil.new
+  config.add Extensions::Modifiers::NumberSigil.new
+  config.add Extensions::Modifiers::TypeSafeMethodArgs.new
+  config.add Extensions::Modifiers::TypeSafeMethodReturns.new
+end
 
 RubyVM::InstructionSequence.singleton_class.prepend(Module.new do
   def load_iseq(filepath)
+    return nil if filepath == File.expand_path('extensions/parser.rb', __dir__)
     ::Extensions::SourceFile.load_iseq(filepath)
   end
 end)

@@ -8,7 +8,8 @@ require 'extensions'
 $LOAD_PATH.unshift File.expand_path('../../tuby', __FILE__)
 require 'tuby'
 
-# require 'irb'
-# IRB.start(__FILE__)
+require_relative '../sample/sigils'
+require_relative '../sample/type_safety'
 
-p Extensions::ASTParser.parse('def a(b = 3 : Integer); b; end')
+require 'irb'
+IRB.start(__FILE__)

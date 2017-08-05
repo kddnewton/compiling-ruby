@@ -6,10 +6,16 @@ module Extensions
     ParserExtension = Struct.new(:symbol, :pattern, :code)
     attr_reader :parser_extensions
 
+    attr_reader :rewriter_class
+
     def initialize
       @builder_extensions = []
       @parser_extensions = []
       yield self
+    end
+
+    def build_rewriter(&block)
+      @rewriter_class = Class.new(Parser::Rewriter, &block)
     end
 
     def extend_builder(method, &block)
@@ -23,7 +29,16 @@ module Extensions
     end
 
     def modify(source)
-      source
+      raise 'You must first configure a rewriter!' unless rewriter_class
+
+      rewriter = rewriter_class.new
+      rewriter.instance_variable_set(:@parser, ASTParser.parser)
+
+      buffer = Parser::Source::Buffer.new('<dynamic>')
+      buffer.source = source
+
+      ast = ASTParser.parse(source)
+      rewriter.rewrite(buffer, ast)
     end
   end
 end
