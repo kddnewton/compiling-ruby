@@ -23,9 +23,8 @@ module Tuby
           tokens << [:NUMBER, $&.to_i]
         when /\A[a-z]([A-Za-z0-9_]+)?/
           tokens << [:IDENT, $&]
-        when /\A.|\n/o
-          symbol = $&
-          tokens << [symbol, symbol]
+        when /\A./o
+          tokens << [$&, $&]
         end
         input = $'
       end

@@ -8,13 +8,16 @@ require 'racc/parser.rb'
 module Tuby
   class Parser < Racc::Parser
 
-module_eval(<<'...end parser.y/module_eval...', 'parser.y', 35)
+module_eval(<<'...end parser.y/module_eval...', 'parser.y', 36)
   include Tuby
-  attr_reader :lexer
+  attr_reader :lexer, :metadata
 
   def parse(input)
     @lexer = Lexer.new(input)
-    do_parse
+    @metadata = Metadata.new
+    result = do_parse
+    puts metadata
+    result
   end
 
   def self.parse(input)
@@ -175,28 +178,28 @@ module_eval(<<'.,.,', 'parser.y', 9)
 
 module_eval(<<'.,.,', 'parser.y', 11)
   def _reduce_3(val, _values, result)
-     result = Node::Binary.new(*val[0..2]) 
+     metadata.add_op(:"+"); result = Node::Binary.new(*val[0..2]) 
     result
   end
 .,.,
 
 module_eval(<<'.,.,', 'parser.y', 12)
   def _reduce_4(val, _values, result)
-     result = Node::Binary.new(*val[0..2]) 
+     metadata.add_op(:"-"); result = Node::Binary.new(*val[0..2]) 
     result
   end
 .,.,
 
 module_eval(<<'.,.,', 'parser.y', 13)
   def _reduce_5(val, _values, result)
-     result = Node::Binary.new(*val[0..2]) 
+     metadata.add_op(:"*"); result = Node::Binary.new(*val[0..2]) 
     result
   end
 .,.,
 
 module_eval(<<'.,.,', 'parser.y', 14)
   def _reduce_6(val, _values, result)
-     result = Node::Binary.new(*val[0..2]) 
+     metadata.add_op(:"/"); result = Node::Binary.new(*val[0..2]) 
     result
   end
 .,.,
@@ -228,26 +231,27 @@ module_eval(<<'.,.,', 'parser.y', 20)
 
 module_eval(<<'.,.,', 'parser.y', 22)
   def _reduce_12(val, _values, result)
-     result = Node::Ident.new(val[0]) 
+     metadata.add_var(val[0])
+                                    result = Node::Ident.new(val[0]) 
     result
   end
 .,.,
 
-module_eval(<<'.,.,', 'parser.y', 24)
+module_eval(<<'.,.,', 'parser.y', 25)
   def _reduce_13(val, _values, result)
      result = Node::Scope.new(val[0]) 
     result
   end
 .,.,
 
-module_eval(<<'.,.,', 'parser.y', 25)
+module_eval(<<'.,.,', 'parser.y', 26)
   def _reduce_14(val, _values, result)
      val[0] << val[2]; result = val[0] 
     result
   end
 .,.,
 
-module_eval(<<'.,.,', 'parser.y', 26)
+module_eval(<<'.,.,', 'parser.y', 27)
   def _reduce_15(val, _values, result)
      result = Node::Scope.new 
     result
