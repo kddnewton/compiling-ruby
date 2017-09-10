@@ -35,5 +35,33 @@ For the above implementation, when `::load_iseq` is called, it will check to det
 
 ## Preprocessors
 
-The above implementation works well and accomplishes the stated goals of the issue. However, there are other possibilities that this new functionality has enabled. After the source is read but before it is compiled, the contents can be preprocessed in any way you want.
+The above implementation works well and accomplishes the stated goals of the issue. However, there are other possibilities that this new functionality has enabled. After the source is read but before it is compiled, the contents can be preprocessed in any way you want. For example, we can implement Elixir-like sigils like so:
 
+```ruby
+contents = File.read(source_path)
+
+# implement date sigils
+format = '%FT%T%:z'
+contents.gsub!(/~d\((.+?)\)/) do |match|
+  content = match[3..-2]
+  begin
+    date = Date.parse(content)
+    "Date.strptime('#{date.strftime(format)}', '#{format}')"
+  rescue ArgumentError
+    "Date.parse(#{content})"
+  end
+end
+
+# implement number sigils
+contents.gsub!(%r{~n\(([\d\s+-/*\(\)]+?)\)}) { |match| eval(match[3..-2]) }
+
+# implement URI sigils
+contents.gsub!(/~u\((.+?)\)/, 'URI.parse("\1")')
+
+iseq = RubyVM::InstructionSequence.compile(contents)
+```
+
+This allows us clearly express date, numbers, and URIs within our code. It also has a couple of other benefits:
+
+* for literal dates in the date sigil, it allows the `~d(January 1st, 2017)` format. This would normally be inefficiently parsed with `Date::parse`, but because of preprocessing actually gets parsed using the much more efficient `Date::strptime`
+* for number sigils, the entire contents of the sigil is evaluated before the code is compiled. This means less memory being allocated and fewer instructions being sent to the VM. For example, usually `24 * 60 * 60` would require two function calls and three stack-allocated numbers. With a sigil (`~n(24 * 60 * 60)`) it's just one stack-allocated number and no function calls.
