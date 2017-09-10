@@ -2,8 +2,10 @@
 
 require 'bundler/setup'
 
-$LOAD_PATH.unshift File.expand_path('../../extensions', __FILE__)
-require 'extensions'
+$LOAD_PATH.unshift File.expand_path('../../vernacular/lib', __FILE__)
+require 'vernacular'
+
+Vernacular.configure(&:give_me_all_the_things!)
 
 $LOAD_PATH.unshift File.expand_path('../../tuby', __FILE__)
 require 'tuby'
