@@ -1,0 +1,7 @@
+#!/usr/bin/env ruby
+
+input = ARGV.first
+yarb  = "#{input}.yarb"
+
+File.binwrite(yarb, RubyVM::InstructionSequence.compile_file(input).to_binary)
+`hexdump #{yarb} > #{input}.hex`
