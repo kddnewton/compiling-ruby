@@ -5,11 +5,11 @@
 #include <stdio.h>
 #include <string.h>
 
-typedef struct buffer Buffer;
+typedef struct tb_buffer Buffer;
 
-Buffer * buffer_build(void);
-void buffer_append(Buffer *buffer, const void *content, unsigned long size);
-void buffer_write(Buffer *buffer, const char *filepath);
-void buffer_destroy(Buffer *buffer);
+Buffer * tb_buffer_build(void);
+void tb_buffer_append(Buffer *buffer, const void *content, unsigned long size);
+void tb_buffer_write(Buffer *buffer, const char *filepath);
+void tb_buffer_destroy(Buffer *buffer);
 
 #endif
