@@ -35,7 +35,11 @@ For the above implementation, when `::load_iseq` is called, it will check to det
 
 ## Preprocessors
 
-The above implementation works well and accomplishes the stated goals of the issue. However, there are other possibilities that this new functionality has enabled. After the source is read but before it is compiled, the contents can be preprocessed in any way you want. For example, we can implement Elixir-like sigils like so:
+The above implementation works well and accomplishes the stated goals of the issue. However, there are other possibilities that this new functionality has enabled. After the source is read but before it is compiled, the contents can be preprocessed in any way you want.
+
+### Modifying as text
+
+As an example, we can modify the text in place without knowledge of the lexical context, as in Elixir-like sigils:
 
 ```ruby
 contents = File.read(source_path)
@@ -65,3 +69,34 @@ This allows us clearly express date, numbers, and URIs within our code. It also 
 
 * for literal dates in the date sigil, it allows the `~d(January 1st, 2017)` format. This would normally be inefficiently parsed with `Date::parse`, but because of preprocessing actually gets parsed using the much more efficient `Date::strptime`
 * for number sigils, the entire contents of the sigil is evaluated before the code is compiled. This means less memory being allocated and fewer instructions being sent to the VM. For example, usually `24 * 60 * 60` would require two function calls and three stack-allocated numbers. With a sigil (`~n(24 * 60 * 60)`) it's just one stack-allocated number and no function calls.
+
+### Modifying as an AST
+
+The other modification we can perform is after the text has been parsed into an abstract syntax tree (and we therefore have lexical context). For example, we can use the `parser` gem to build our own AST that contains invalid `Ruby`, rewrite it to a valid `Ruby` AST, and continue on, as in:
+
+```ruby
+content = File.read(source_path)
+
+require 'parser/current'
+
+# class CustomBuilder < Parser::Builders::Default
+builder  = CustomBuilder.new
+
+# class CustomParser < Parser::CurrentRuby
+parser   = CustomParser.new(builder)
+
+# class CustomRewriter < Parser::Rewriter
+rewriter = CustomRewriter.new
+rewriter.instance_variable_set(:@parser, parser)
+
+buffer = Parser::Base.send(:setup_source_buffer, '(string)', 1,
+                           content, parser.default_encoding)
+ast = parser.parse(content)
+content = rewriter.rewrite(buffer, ast)
+
+iseq = RubyVM::InstructionSequence.compile(content)
+```
+
+### Vernacular
+
+All of these modifications and more are encompassed by the [`vernacular`](vernacular) gem, included in this repository.
