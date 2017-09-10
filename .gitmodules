@@ -1,0 +1,4 @@
+[submodule "vernacular"]
+	path = vernacular
+	url = git@github.com:kddeisz/vernacular.git
+	branch = master
