@@ -3,5 +3,9 @@
 input = ARGV.first
 yarb  = "#{input}.yarb"
 
-File.binwrite(yarb, RubyVM::InstructionSequence.compile_file(input).to_binary)
+iseq = RubyVM::InstructionSequence.compile_file(input)
+puts iseq.disasm
+puts
+
+File.binwrite(yarb, iseq.to_binary)
 `hexdump #{yarb} > #{input}.hex`

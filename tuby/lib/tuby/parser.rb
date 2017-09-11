@@ -18,7 +18,10 @@ module_eval(<<'...end parser.y/module_eval...', 'parser.y', 40)
   end
 
   def compile(input)
-    parse(input)
+    @iseq = InstructionSequence.new
+    @lexer = Lexer.new(input)
+
+    iseq.scope = do_parse
     iseq
   end
 

@@ -1,6 +1,6 @@
 module Tuby
   class InstructionSequence
-    attr_reader :ids, :local, :calls
+    attr_reader :ids, :local, :calls, :insns
 
     def initialize
       @ids = Set.new([0])
@@ -16,6 +16,10 @@ module Tuby
     def add_variable(variable)
       ids << variable
       local << variable
+    end
+
+    def scope=(scope)
+      @insns = scope.compile
     end
 
     private
