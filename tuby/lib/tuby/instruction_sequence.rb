@@ -17,5 +17,11 @@ module Tuby
       ids << variable
       local << variable
     end
+
+    private
+
+    def ids_list
+      ids.to_a
+    end
   end
 end
