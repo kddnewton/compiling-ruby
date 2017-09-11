@@ -9,10 +9,14 @@ rule
 
   assign: identifier '=' expr     { result = Node::Assign.new(val[0], val[2]) }
 
-  expr: expr '+' expr             { metadata.add_op(:"+"); result = Node::Binary.new(*val[0..2]) }
-      | expr '-' expr             { metadata.add_op(:"-"); result = Node::Binary.new(*val[0..2]) }
-      | expr '*' expr             { metadata.add_op(:"*"); result = Node::Binary.new(*val[0..2]) }
-      | expr '/' expr             { metadata.add_op(:"/"); result = Node::Binary.new(*val[0..2]) }
+  expr: expr '+' expr             { iseq.add_operator(:"+")
+                                    result = Node::Binary.new(*val[0..2]) }
+      | expr '-' expr             { iseq.add_operator(:"-")
+                                    result = Node::Binary.new(*val[0..2]) }
+      | expr '*' expr             { iseq.add_operator(:"*")
+                                    result = Node::Binary.new(*val[0..2]) }
+      | expr '/' expr             { iseq.add_operator(:"/")
+                                    result = Node::Binary.new(*val[0..2]) }
       | '(' expr ')'              { result = val[1] }
       | number
       | identifier
@@ -20,7 +24,7 @@ rule
   number: '-' NUMBER  =UMINUS     { result = Node::Number.new(-val[1]) }
         | NUMBER                  { result = Node::Number.new(val[0]) }
 
-  identifier: IDENT               { metadata.add_var(val[0])
+  identifier: IDENT               { iseq.add_variable(val[0])
                                     result = Node::Ident.new(val[0]) }
 
   scope: statement                { result = Node::Scope.new(val[0]) }
@@ -33,19 +37,25 @@ rule
 end
 
 ---- inner
-  include Tuby
-  attr_reader :lexer, :metadata
+  attr_reader :lexer, :iseq
 
   def parse(input)
+    @iseq = InstructionSequence.new
     @lexer = Lexer.new(input)
-    @metadata = Metadata.new
-    result = do_parse
-    puts metadata
-    result
+    do_parse
+  end
+
+  def compile(input)
+    parse(input)
+    iseq
   end
 
   def self.parse(input)
     new.parse(input)
+  end
+
+  def self.compile(input)
+    new.compile(input)
   end
 
   def next_token

@@ -8,20 +8,26 @@ require 'racc/parser.rb'
 module Tuby
   class Parser < Racc::Parser
 
-module_eval(<<'...end parser.y/module_eval...', 'parser.y', 36)
-  include Tuby
-  attr_reader :lexer, :metadata
+module_eval(<<'...end parser.y/module_eval...', 'parser.y', 40)
+  attr_reader :lexer, :iseq
 
   def parse(input)
+    @iseq = InstructionSequence.new
     @lexer = Lexer.new(input)
-    @metadata = Metadata.new
-    result = do_parse
-    puts metadata
-    result
+    do_parse
+  end
+
+  def compile(input)
+    parse(input)
+    iseq
   end
 
   def self.parse(input)
     new.parse(input)
+  end
+
+  def self.compile(input)
+    new.compile(input)
   end
 
   def next_token
@@ -178,33 +184,37 @@ module_eval(<<'.,.,', 'parser.y', 9)
 
 module_eval(<<'.,.,', 'parser.y', 11)
   def _reduce_3(val, _values, result)
-     metadata.add_op(:"+"); result = Node::Binary.new(*val[0..2]) 
-    result
-  end
-.,.,
-
-module_eval(<<'.,.,', 'parser.y', 12)
-  def _reduce_4(val, _values, result)
-     metadata.add_op(:"-"); result = Node::Binary.new(*val[0..2]) 
+     iseq.add_operator(:"+")
+                                    result = Node::Binary.new(*val[0..2]) 
     result
   end
 .,.,
 
 module_eval(<<'.,.,', 'parser.y', 13)
-  def _reduce_5(val, _values, result)
-     metadata.add_op(:"*"); result = Node::Binary.new(*val[0..2]) 
-    result
-  end
-.,.,
-
-module_eval(<<'.,.,', 'parser.y', 14)
-  def _reduce_6(val, _values, result)
-     metadata.add_op(:"/"); result = Node::Binary.new(*val[0..2]) 
+  def _reduce_4(val, _values, result)
+     iseq.add_operator(:"-")
+                                    result = Node::Binary.new(*val[0..2]) 
     result
   end
 .,.,
 
 module_eval(<<'.,.,', 'parser.y', 15)
+  def _reduce_5(val, _values, result)
+     iseq.add_operator(:"*")
+                                    result = Node::Binary.new(*val[0..2]) 
+    result
+  end
+.,.,
+
+module_eval(<<'.,.,', 'parser.y', 17)
+  def _reduce_6(val, _values, result)
+     iseq.add_operator(:"/")
+                                    result = Node::Binary.new(*val[0..2]) 
+    result
+  end
+.,.,
+
+module_eval(<<'.,.,', 'parser.y', 19)
   def _reduce_7(val, _values, result)
      result = val[1] 
     result
@@ -215,43 +225,43 @@ module_eval(<<'.,.,', 'parser.y', 15)
 
 # reduce 9 omitted
 
-module_eval(<<'.,.,', 'parser.y', 19)
+module_eval(<<'.,.,', 'parser.y', 23)
   def _reduce_10(val, _values, result)
      result = Node::Number.new(-val[1]) 
     result
   end
 .,.,
 
-module_eval(<<'.,.,', 'parser.y', 20)
+module_eval(<<'.,.,', 'parser.y', 24)
   def _reduce_11(val, _values, result)
      result = Node::Number.new(val[0]) 
     result
   end
 .,.,
 
-module_eval(<<'.,.,', 'parser.y', 22)
+module_eval(<<'.,.,', 'parser.y', 26)
   def _reduce_12(val, _values, result)
-     metadata.add_var(val[0])
+     iseq.add_variable(val[0])
                                     result = Node::Ident.new(val[0]) 
     result
   end
 .,.,
 
-module_eval(<<'.,.,', 'parser.y', 25)
+module_eval(<<'.,.,', 'parser.y', 29)
   def _reduce_13(val, _values, result)
      result = Node::Scope.new(val[0]) 
     result
   end
 .,.,
 
-module_eval(<<'.,.,', 'parser.y', 26)
+module_eval(<<'.,.,', 'parser.y', 30)
   def _reduce_14(val, _values, result)
      val[0] << val[2]; result = val[0] 
     result
   end
 .,.,
 
-module_eval(<<'.,.,', 'parser.y', 27)
+module_eval(<<'.,.,', 'parser.y', 31)
   def _reduce_15(val, _values, result)
      result = Node::Scope.new 
     result
