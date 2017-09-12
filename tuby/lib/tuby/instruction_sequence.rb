@@ -19,13 +19,24 @@ module Tuby
     end
 
     def scope=(scope)
-      @insns = scope.compile
+      @insns = inject_traces_to(scope.compile)
     end
 
     private
 
     def ids_list
       ids.to_a
+    end
+
+    def inject_traces_to(insns)
+      lineno = 0
+      insns.each_with_object([]) do |insn, full|
+        if lineno != insn.lineno
+          lineno = insn.lineno
+          full << Insn.new(lineno, :trace, 1)
+        end
+        full << insn
+      end
     end
   end
 end

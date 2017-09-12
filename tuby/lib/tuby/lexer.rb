@@ -1,34 +1,39 @@
 module Tuby
   class Lexer
-    attr_reader :tokens
+    attr_reader :text, :lineno, :newline
 
-    def initialize(input)
-      @tokens = []
-      parse(input)
+    def initialize(text)
+      @text = text
+      @lineno = 1
+      @newline = false
     end
 
     def next_token
-      tokens.shift
-    end
+      if newline
+        @lineno += 1
+        @newline = false
+      end
+      pair = nil
 
-    private
-
-    def parse(input)
-      until input.empty?
-        case input
+      until pair
+        case text
+        when ''
+          pair = [false, '$end']
         when /\A\n/
-          tokens << [:NEWLINE, "\n"]
+          @newline = true
+          pair = [:NEWLINE, "\n"]
         when /\A\s+/
         when /\A\d+/
-          tokens << [:NUMBER, $&.to_i]
+          pair = [:NUMBER, $&.to_i]
         when /\A[a-z]([A-Za-z0-9_]+)?/
-          tokens << [:IDENT, $&]
+          pair = [:IDENT, $&]
         when /\A./o
-          tokens << [$&, $&]
+          pair = [$&, $&]
         end
-        input = $'
+        @text = $'
       end
-      tokens.push [false, '$end']
+
+      pair
     end
   end
 end

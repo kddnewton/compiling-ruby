@@ -36,6 +36,10 @@ module_eval(<<'...end parser.y/module_eval...', 'parser.y', 40)
   def next_token
     lexer.next_token
   end
+
+  def n(type, *children)
+    Node.const_get(type).new(lexer.lineno, *children)
+  end
 ...end parser.y/module_eval...
 ##### State transition tables begin ###
 
@@ -180,7 +184,7 @@ Racc_debug_parser = false
 
 module_eval(<<'.,.,', 'parser.y', 9)
   def _reduce_2(val, _values, result)
-     result = Node::Assign.new(val[0], val[2]) 
+     result = n(:Assign, val[0], val[2]) 
     result
   end
 .,.,
@@ -188,7 +192,7 @@ module_eval(<<'.,.,', 'parser.y', 9)
 module_eval(<<'.,.,', 'parser.y', 11)
   def _reduce_3(val, _values, result)
      iseq.add_operator(:"+")
-                                    result = Node::Binary.new(*val[0..2]) 
+                                    result = n(:Binary, *val[0..2]) 
     result
   end
 .,.,
@@ -196,7 +200,7 @@ module_eval(<<'.,.,', 'parser.y', 11)
 module_eval(<<'.,.,', 'parser.y', 13)
   def _reduce_4(val, _values, result)
      iseq.add_operator(:"-")
-                                    result = Node::Binary.new(*val[0..2]) 
+                                    result = n(:Binary, *val[0..2]) 
     result
   end
 .,.,
@@ -204,7 +208,7 @@ module_eval(<<'.,.,', 'parser.y', 13)
 module_eval(<<'.,.,', 'parser.y', 15)
   def _reduce_5(val, _values, result)
      iseq.add_operator(:"*")
-                                    result = Node::Binary.new(*val[0..2]) 
+                                    result = n(:Binary, *val[0..2]) 
     result
   end
 .,.,
@@ -212,7 +216,7 @@ module_eval(<<'.,.,', 'parser.y', 15)
 module_eval(<<'.,.,', 'parser.y', 17)
   def _reduce_6(val, _values, result)
      iseq.add_operator(:"/")
-                                    result = Node::Binary.new(*val[0..2]) 
+                                    result = n(:Binary, *val[0..2]) 
     result
   end
 .,.,
@@ -230,14 +234,14 @@ module_eval(<<'.,.,', 'parser.y', 19)
 
 module_eval(<<'.,.,', 'parser.y', 23)
   def _reduce_10(val, _values, result)
-     result = Node::Number.new(-val[1]) 
+     result = n(:Number, -val[1]) 
     result
   end
 .,.,
 
 module_eval(<<'.,.,', 'parser.y', 24)
   def _reduce_11(val, _values, result)
-     result = Node::Number.new(val[0]) 
+     result = n(:Number, val[0]) 
     result
   end
 .,.,
@@ -245,14 +249,14 @@ module_eval(<<'.,.,', 'parser.y', 24)
 module_eval(<<'.,.,', 'parser.y', 26)
   def _reduce_12(val, _values, result)
      iseq.add_variable(val[0])
-                                    result = Node::Ident.new(val[0]) 
+                                    result = n(:Ident, val[0]) 
     result
   end
 .,.,
 
 module_eval(<<'.,.,', 'parser.y', 29)
   def _reduce_13(val, _values, result)
-     result = Node::Scope.new(val[0]) 
+     result = n(:Scope, val[0]) 
     result
   end
 .,.,
@@ -266,7 +270,7 @@ module_eval(<<'.,.,', 'parser.y', 30)
 
 module_eval(<<'.,.,', 'parser.y', 31)
   def _reduce_15(val, _values, result)
-     result = Node::Scope.new 
+     result = n(:Scope) 
     result
   end
 .,.,

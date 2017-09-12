@@ -1,8 +1,8 @@
 module Tuby
   module Node
-    Assign = Struct.new(:ident, :expr) do
+    Assign = Struct.new(:lineno, :ident, :expr) do
       def compile
-        [*expr.compile, [:setlocal, ident.name]]
+        [*expr.compile, Insn.new(lineno, :setlocal, ident.name)]
       end
 
       def exec(state)
@@ -12,11 +12,11 @@ module Tuby
       end
     end
 
-    Binary = Struct.new(:left, :op, :right) do
+    Binary = Struct.new(:lineno, :left, :op, :right) do
       OPS = { '+' => :plus, '-' => :minus, '*' => :mult, '/' => :div }
 
       def compile
-        [*left.compile, *right.compile, :"opt_#{OPS[op]}"]
+        [*left.compile, *right.compile, Insn.new(lineno, :"opt_#{OPS[op]}")]
       end
 
       def exec(state)
@@ -26,9 +26,9 @@ module Tuby
       end
     end
 
-    Ident = Struct.new(:name) do
+    Ident = Struct.new(:lineno, :name) do
       def compile
-        [[:getlocal, name]]
+        [Insn.new(lineno, :getlocal, name)]
       end
 
       def exec(state)
@@ -39,9 +39,9 @@ module Tuby
       end
     end
 
-    Number = Struct.new(:value) do
+    Number = Struct.new(:lineno, :value) do
       def compile
-        [[:putobject, value]]
+        [Insn.new(lineno, :putobject, value)]
       end
 
       def exec(state)
@@ -50,9 +50,10 @@ module Tuby
     end
 
     class Scope
-      attr_reader :statements
+      attr_reader :lineno, :statements
 
-      def initialize(statement = nil)
+      def initialize(lineno, statement = nil)
+        @lineno = lineno
         @statements = statement ? [statement] : []
       end
 
