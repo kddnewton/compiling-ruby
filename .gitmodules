@@ -2,3 +2,7 @@
 	path = vernacular
 	url = git@github.com:kddeisz/vernacular.git
 	branch = master
+[submodule "tuby"]
+	path = tuby
+	url = git@github.com:kddeisz/tuby.git
+	branch = master
